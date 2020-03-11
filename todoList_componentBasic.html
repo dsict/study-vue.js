@@ -1,0 +1,193 @@
+<!--
+    단일 컴포넌트 Single Component 공부
+    [ 컴포넌트 사용 장점 ]
+    1. 재사용성: 반복되는 부분을 컴포넌트로 작성하여 재사용함으로써 생산성 향상
+    2. 테스트 용이: 컴포넌트 단위 기능 테스트 가능 (테스트 도구: karma, mocha)
+    3. 쉬운 디버깅: Vue devtools와 같은 도구로 전달된 속성과 부모 컴포넌트로 전달된 이벤트 정보를 손쉽게 파악할 수 있음
+-->
+<!--
+    부모 > 자식 단방향으로만 속성(props)로 데이터 전달 가능
+    자식 > 부모 컴포는트로 이벤트 발신(emit)
+    data, methods, computed, watch과 같은 vue 인스턴스 옵션 사용 가능
+
+    [주의 사항]
+    *** data는 로컬 상태(local state)를 관리하기 위한 용도로만 사용
+    *** data 옵션을 단순한 객체값으로 작성 불가!!! 객체값으로 작성하는 경우, 객체가 참조형 값이기 때문에 모두 동일한 값을 참조하게 되기 때문
+    *** data 옵션은 반.드.시 함수로 작성하고, 함수 내부에서 객체를 리턴하도록 작성
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Component Basic</title>
+    <!-- 공용 스타일 시작-->
+    <style>
+    * {  box-sizing: border-box;  }
+    .header {
+        background-color: purple; padding: 30px 30px;
+        color: yellow; text-align: center;
+    }
+    .header:after {
+        content: ""; display: table; clear: both;
+    }
+    </style>
+    <!-- 공용 스타일 끝-->
+    <script src="https://unpkg.com/vue@2.5.16/dist/vue.js"></script>
+</head>
+
+
+
+<!--이벤트 버스 객체 시작-->
+<script type="text/javascript">
+    var eventBus = new Vue();
+    // 별도 데이터 정보 없이, 순수하게 이벤트를 통해서 컴포넌트 간의 정보 교환을 위해서 사용
+</script>
+<!--이벤트 버스 객체 끝-->
+
+
+<!-- input-component 시작-->
+<style>
+    .input {
+        border: none; width: 75%; height:35px; padding: 10px;
+        float: left; font-size: 16px;
+    }
+    .addbutton {
+        padding: 10px; width: 25%; height:35px; background: #d9d9d9; 
+        color: #555; float: left; text-align: center;
+        font-size: 13px; cursor: pointer; transition: 0.3s;
+    }
+    .addbutton:hover { background-color: #bbb; }
+</style>
+
+ <template id="input-template">
+        <div>
+            <input class="input" type="text" id="task" v-model.trim="todo" 
+                placeholder="입력 후 엔터!" v-on:keyup.enter="addTodo">
+            <span class="addbutton" v-on:click="addTodo">추 가</span>
+        </div>    
+</template>
+    
+<script type="text/javascript">
+    Vue.component('input-component', {
+        template : '#input-template',
+        data : function() {
+            return { todo : "" }
+        },
+        methods : {
+            addTodo : function() {
+                eventBus.$emit('add-todo', this.todo);
+                // 이벤트 발생
+                this.todo = "";
+            }
+        }
+    })
+</script>
+ <!-- input-component 끝-->
+
+<!-- list-component 시작-->
+<style>
+    ul {  margin: 0; padding: 0; }
+    ul li { 
+        cursor: pointer; position: relative; padding: 8px 8px 8px 40px;
+        background: #eee; font-size: 14px;  transition: 0.2s;
+        -webkit-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;  
+    }
+    ul li:hover {  background: #ddd;  }
+    ul li.checked {
+        background: #BBB;  color: #fff; text-decoration: line-through;
+    }
+    ul li.checked::before {
+        content: ''; position: absolute; border-color: #fff;
+        border-style: solid; border-width: 0px 1px 1px 0px; 
+        top: 10px; left: 16px;  transform: rotate(45deg);
+        height: 8px; width: 8px;
+    }
+    .close {
+        position: absolute; right: 0; top: 0;
+        padding: 12px 16px 12px 16px
+    }
+    .close:hover {
+        background-color: #f44336;  color: white;
+    }
+</style>
+
+<template id="list-template">
+    <ul id="todolist">
+        <li v-for="a in todolist" v-bind:class="checked(a.done)"
+            v-on:click="doneToggle(a.id)">
+            <span>{{ a.todo }}</span>
+            <span v-if="a.done"> (완료)</span>
+            <span class="close" v-on:click.stop="deleteTodo(a.id)">&#x00D7;</span>
+        </li>
+    </ul>
+</template>
+
+<script type="text/javascript">
+// 컴포넌트 작성 메소드 Vue.componenet(tagname, options)
+// options: template 등을 지정
+    Vue.component('list-component', {
+        template : '#list-template',
+        created : function() {
+            eventBus.$on('add-todo', this.addTodo);
+            // add todo 이벤트 버스 객체에 바인딩 후 호출
+            // 이벤트를 수신하는 컴포넌트는 미리 이벤트 핸드러를 등록해야함
+            // Create 이벤트 훅으로 Vue 인스턴스가 만들어 질 때, $on 메서드로 이벤트 수신 정보를 등록해둠
+        },
+        data : function() {
+            return {
+                todolist : [
+                    { id:1, todo : "영화보기", done:false },
+                    { id:2, todo : "주말 산책", done:true },
+                    { id:3, todo : "ES6 학습", done:false },
+                    { id:4, todo : "잠실 야구장", done:false },
+                ]
+            }
+        },
+        methods : {
+            checked : function(done) {
+                if(done) return { checked:true };
+                else return { checked:false };
+            },
+            addTodo : function(todo) {
+                if (todo !== "") {
+                    this.todolist.push({ id:new Date().getTime(), todo : todo, done:false });
+                }
+            },
+            doneToggle : function(id) {
+                var index = this.todolist.findIndex(function(item) {
+                    return item.id === id;
+                })
+                this.todolist[index].done = !this.todolist[index].done;
+            },
+            deleteTodo : function(id) {
+                var index = this.todolist.findIndex(function(item) {
+                    return item.id === id;
+                })
+                this.todolist.splice(index,1);
+            }
+        }
+    })
+    </script>
+<!-- list-component 끝-->
+
+<body>
+    <div id="todolistapp">
+        <div id="header" class="header">
+            <h2>Todo List App</h2>
+            <input-component></input-component>
+        </div>
+        <list-component></list-component>
+    </div>
+</body>
+
+
+<script type="text/javascript">
+var vm = new Vue({
+    el : "#todolistapp"
+})
+
+</script>
+</html>
