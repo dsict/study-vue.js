@@ -1,8 +1,0 @@
-단일 컴포넌트의 문제점
-> 빌드가 없음 - EX6, TypeScript 지원 불가
-> CSS 미지원
-> 하나의 파일에 여러개의 <template />이 작성되어 식별이 어려움
-
-vue-loader
-> .vue 파일에서 <template />, <script />, <style />을 파싱하고 다른 로더들을 활용해 하나의 모듈로 조합
-> css-loader로 css 전처리 및 스타일 정보 모듈화 할 수 있음
