@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>05-12</title>
+  <style>
+    * {  box-sizing: border-box;  }
+    ul {  margin: 0; padding: 0; }
+    ul li { 
+        cursor: pointer; position: relative; padding: 8px 8px 8px 40px;
+        background: #eee; font-size: 14px;  transition: 0.2s;
+        -webkit-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;  
+    }
+    ul li:hover {  background: #ddd;  }
+    ul li.checked {
+        background: #BBB;  color: #fff; text-decoration: line-through;
+    }
+    ul li.checked::before {
+        content: ''; position: absolute; border-color: #fff;
+        border-style: solid; border-width: 0px 1px 1px 0px; 
+        top: 10px; left: 16px;  transform: rotate(45deg);
+        height: 8px; width: 8px;
+    }
+    .close {
+        position: absolute; right: 0; top: 0;
+        padding: 12px 16px 12px 16px
+    }
+    .close:hover {
+        background-color: #f44336;  color: white;
+    }
+    .header {
+        background-color: purple; padding: 30px 30px;
+        color: yellow; text-align: center;
+    }
+    .header:after {
+        content: ""; display: table; clear: both;
+    }
+    .input {
+        border: none; width: 75%; height:35px; padding: 10px;
+        float: left; font-size: 16px;
+    }
+    .addbutton {
+        padding: 10px; width: 25%; height:35px; background: #d9d9d9; 
+        color: #555; float: left; text-align: center;
+        font-size: 13px; cursor: pointer; transition: 0.3s;
+    }
+    .addbutton:hover { background-color: #bbb; }
+    .completed { text-decoration:none; }
+  </style>
+  <script src="https://unpkg.com/vue@2.5.16/dist/vue.js"></script>
+</head>
+<body>
+<div id="todolistapp">
+    <div id="header" class="header">
+        <h2>Todo List App</h2>
+        <input class="input" type="text" id="task" v-model.trim="todo" 
+            placeholder="입력 후 엔터!" v-on:keyup.enter="addTodo"> 
+            <!--v-model로 데이터 양방향 바인딩-->
+            <!--enter 입력시 addTodo method 호출--> 
+        <span class="addbutton" v-on:click="addTodo">추 가</span>
+        <!--클릭시 addTodo method 호출--> 
+    </div>
+    <ul id="todolist"> 
+        <li v-for="a in todolist" v-bind:class="checked(a.done)"
+            v-on:click="doneToggle(a.id)">
+            <!--v-for 디렉티브로 todolist 만큼 반복 출력-->
+            <!--v-bind로 단방향 데이터 바인딩으로 done 유무 확인-->
+            <!--v-on 디렉티브로 클릭시 done 유무 토글-->
+            <span>{{ a.todo }}</span>
+            <!--HTML 요소에서 사용하는 {{ }}은 템플릿 표현식으로 선언적으로 HTML DOM에 데이터를 렌더링한다.-->
+            <span v-if="a.done"> (완료)</span>
+            <span class="close" v-on:click.stop="deleteTodo(a.id)">&#x00D7;</span>
+            <!--stop 수식어로 이벤트 버블링에 의한 상위 요소 클릭 호출 방지-->
+        </li>
+    </ul>
+</div>
+<script type="text/javascript">
+var vm = new Vue({
+    // create vue instance
+    el : "#todolistapp", //data binding
+    data : {
+        todo : "", // input
+        todolist : [
+            // ul 데이터 바인딩
+            { id:1, todo : "영화보기", done:false },
+            { id:2, todo : "주말 산책", done:true },
+            { id:3, todo : "ES6 학습", done:false },
+            { id:4, todo : "잠실 야구장", done:false }
+        ]
+    },
+    methods : {
+        checked : function(done) {
+            // todolist data 속성에서 done 속성이 true 인경우, checked 클래스 적용 여부를 결정하는 메소드
+            if(done) return { checked:true };
+            else return { checked:false };
+        },
+        addTodo : function(e) {
+            //enter나 버튼 클릭을 통한 할일 목록 추가하는 메소드
+            if (this.todo !== "") {
+                this.todolist.push({ id: new Date().getTime(), todo : this.todo, done:false });
+                this.todo = "";
+            }
+        },
+        deleteTodo : function(id) {
+            // x 클릭시, 할일 삭제
+            // 배열 메서드에서 slice(index, deletecount)를 사용하여 배열 삭제
+            var index = this.todolist.findIndex(function(item) { 
+                return item.id === id;
+            })
+            this.todolist.splice(index,1);
+        },
+        doneToggle : function(id) {
+            //done 속성을 true/false로 토글
+            var index = this.todolist.findIndex(function(item) { 
+                return item.id === id;
+            })
+            this.todolist[index].done = !this.todolist[index].done;
+        }
+    }
+})
+</script>
+</body>
+</html>
