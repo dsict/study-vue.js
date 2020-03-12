@@ -29,7 +29,9 @@ import Vue from 'vue'
 
 
 // named slot
-import App from './AppNamed.vue'
+// import App from './AppNamed.vue'
+
+import App from './DynamicComponent.vue'
 
 Vue.config.productionTip = false;
 
