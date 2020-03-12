@@ -1,16 +1,16 @@
 import Vue from 'vue'
 // 원래 있던 코드
-import App from './App.vue'
-import router from './router'
-import store from './store'
 
-Vue.config.productionTip = false
+// import router from './router'
+// import store from './store'
 
-new Vue({
-  router,
-  store,
-  render: h => h(App)
-}).$mount('#app')
+// Vue.config.productionTip = false
+
+// new Vue({
+//   router,
+//   store,
+//   render: h => h(App)
+// }).$mount('#app')
 
 
 //App.vue 컴포넌트를 화면에 담기위해서 사용
@@ -18,7 +18,7 @@ new Vue({
 
 
 // todo list 
-// import TodoList from './components/TodoList.vue'
+// import TodoList from './TodoList.vue'
 
 // Vue.config.productionTip = false;
 
@@ -27,3 +27,12 @@ new Vue({
 // }).$mount('#app')
 
 
+
+// named slot
+import App from './AppNamed.vue'
+
+Vue.config.productionTip = false;
+
+new Vue({
+  render: h => h(App)
+}).$mount('#app')

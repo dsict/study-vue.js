@@ -22,8 +22,8 @@
 </template>
 
 <script type="text/javascript">
-import InputTodo from './InputTodo';
-import List from './List';
+import InputTodo from './components/InputTodo';
+import List from './components/List';
 
 export default {
     name: 'todo-list',

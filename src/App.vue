@@ -27,8 +27,6 @@ export default {
   body{ text-align:center; }
 </style>
 
-
-
 <!--
     전역 수준 컴포넌트의 문제점
     > 빌드가 없음 - EX6, TypeScript 지원 불가
